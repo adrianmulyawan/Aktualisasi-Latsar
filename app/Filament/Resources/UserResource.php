@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UserResource extends Resource
@@ -49,7 +50,8 @@ class UserResource extends Resource
                     ->maxLength(255)
                     ->dehydrated(fn($state) => !empty($state))
                     ->revealable(true)
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->visible(fn(string $operation): bool => $operation === 'create'),
                 DateTimePicker::make('email_verified_at')
                     ->label('Email Terverifikasi Pada')
                     ->required(fn(Forms\Get $get) => $get('id') === null)
@@ -89,7 +91,9 @@ class UserResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -112,5 +116,26 @@ class UserResource extends Resource
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    // Rule for specifying who can access this resource
+    public static function canCreate(): bool
+    {
+        return auth()->user()->hasRole('super_admin');
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->user()->hasRole('super_admin');
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->user()->hasRole('super_admin');
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return auth()->user()->hasRole('super_admin');
     }
 }
