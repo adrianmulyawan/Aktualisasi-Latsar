@@ -109,7 +109,8 @@ class DocumentResource extends Resource
                 TextColumn::make('title')
                     ->label('Judul Dokumen')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(50),
                 TextColumn::make('category.name')
                     ->label('Kategori')
                     ->searchable()
