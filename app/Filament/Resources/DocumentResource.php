@@ -118,7 +118,8 @@ class DocumentResource extends Resource
                 TextColumn::make('description')
                     ->label('Deskripsi')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(50),
                 TextColumn::make('user.name')
                     ->label('Penulis')
                     ->searchable()

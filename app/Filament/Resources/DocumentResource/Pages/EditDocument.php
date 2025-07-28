@@ -18,21 +18,33 @@ class EditDocument extends EditRecord
         ];
     }
 
+    // logic ketika user ada input file baru
     protected function mutateFormDataBeforeSave(array $data): array
     {
+        // Ambil file lama dari record
         $oldFiles = $this->record->file;
 
-        // Jika user mengupload file baru
-        if (!empty($data['file'])) {
+        // Periksa apakah user memilih file baru
+        $isNewUpload = !empty($data['file']) && $data['file'] !== $oldFiles;
+
+        if ($isNewUpload) {
             // Hapus file lama dari storage
             foreach ($oldFiles ?? [] as $oldFile) {
                 Storage::disk('public')->delete($oldFile);
             }
+            // Biarkan file baru disimpan
         } else {
-            // Tidak ada upload baru, gunakan file lama
+            // User tidak upload file baru, simpan file lama
             $data['file'] = $oldFiles;
         }
 
         return $data;
+    }
+
+
+    // logic ketika berhasil update document
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
 }
