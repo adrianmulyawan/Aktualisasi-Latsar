@@ -22,6 +22,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class DocumentResource extends Resource
@@ -98,7 +99,7 @@ class DocumentResource extends Resource
                     ->required()
                     ->maxLength(255)
                     ->columnSpanFull()
-                    ->default(auth()->user()->name),
+                    ->default(Auth::user()->name),
             ]);
     }
 
@@ -172,16 +173,16 @@ class DocumentResource extends Resource
 
     public static function canCreate(): bool
     {
-        return auth()->user()->hasRole('super_admin') || auth()->user()->hasRole('user');
+        return Auth::user()->hasRole('super_admin') || Auth::user()->hasRole('user');
     }
 
     public static function canEdit(Model $record): bool
     {
-        return auth()->user()->hasRole('super_admin') || (auth()->user()->hasRole('user') && $record->user_id === auth()->user()->id);
+        return Auth::user()->hasRole('super_admin') || (Auth::user()->hasRole('user') && $record->user_id === Auth::user()->id);
     }
 
     public static function canDelete(Model $record): bool
     {
-        return auth()->user()->hasRole('super_admin') || (auth()->user()->hasRole('user') && $record->user_id === auth()->user()->id);
+        return Auth::user()->hasRole('super_admin') || (Auth::user()->hasRole('user') && $record->user_id === Auth::user()->id);
     }
 }
