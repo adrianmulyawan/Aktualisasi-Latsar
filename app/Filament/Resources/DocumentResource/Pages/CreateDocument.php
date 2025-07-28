@@ -5,6 +5,7 @@ namespace App\Filament\Resources\DocumentResource\Pages;
 use App\Filament\Resources\DocumentResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Support\Facades\Auth;
 
 class CreateDocument extends CreateRecord
 {
@@ -12,7 +13,7 @@ class CreateDocument extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['user_id'] = auth()->user()->id; // Simpan user_id yang login
+        $data['user_id'] = Auth::user()->id; // Simpan user_id yang login
         return $data;
     }
 }

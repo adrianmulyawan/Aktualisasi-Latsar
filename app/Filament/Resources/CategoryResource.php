@@ -17,6 +17,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class CategoryResource extends Resource
@@ -39,7 +40,7 @@ class CategoryResource extends Resource
                     ->lazy()
                     ->afterStateUpdated(function (Set $set, ?string $state) {
                         $set('slug', Str::slug($state));
-                        $set('author', auth()->user()->name);
+                        $set('author', Auth::user()->name);
                     }),
                 TextInput::make('slug')
                     ->label('Slug')
@@ -112,21 +113,21 @@ class CategoryResource extends Resource
 
     public static function canView(Model $record): bool
     {
-        return auth()->user()->hasRole('super_admin');
+        return Auth::user()->hasRole('super_admin');
     }
 
     public static function canCreate(): bool
     {
-        return auth()->user()->hasRole('super_admin');
+        return Auth::user()->hasRole('super_admin');
     }
 
     public static function canEdit(Model $record): bool
     {
-        return auth()->user()->hasRole('super_admin');
+        return Auth::user()->hasRole('super_admin');
     }
 
     public static function canDelete(Model $record): bool
     {
-        return auth()->user()->hasRole('super_admin');
+        return Auth::user()->hasRole('super_admin');
     }
 }
