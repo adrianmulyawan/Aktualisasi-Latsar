@@ -90,8 +90,10 @@ class DocumentResource extends Resource
                     ])
                     ->maxSize(10240) // 10 MB
                     ->multiple()
-                    ->enableDownload()
-                    ->enableOpen()
+                    ->downloadable()
+                    ->openable()
+                    // ->enableDownload()
+                    // ->enableOpen()
                     ->maxFiles(5)
                     ->columnSpanFull(),
                 TextInput::make('author')
