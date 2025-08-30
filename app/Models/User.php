@@ -56,4 +56,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Document::class);
     }
+
+    public function documentRevisions()
+    {
+        return $this->hasMany(DocumentRevision::class);
+    }
 }
