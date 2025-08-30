@@ -34,4 +34,9 @@ class Document extends Model
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
+
+    public function documentRevisions()
+    {
+        return $this->hasMany(DocumentRevision::class);
+    }
 }
