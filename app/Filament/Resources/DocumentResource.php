@@ -5,10 +5,13 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\DocumentResource\Pages;
 use App\Filament\Resources\DocumentResource\RelationManagers;
 use App\Models\Document;
+use App\Models\DocumentRevision;
 use Dom\Text;
 use DragonCode\PrettyArray\Services\File;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -102,6 +105,57 @@ class DocumentResource extends Resource
                     ->maxLength(255)
                     ->columnSpanFull()
                     ->default(Auth::user()->name),
+                Repeater::make('documentRevisions')
+                    ->label('Revisi Dokumen')
+                    ->relationship('documentRevisions') // Menghubungkan dengan relasi di model
+                    ->columnSpanFull()
+                    ->schema([
+                        TextInput::make('revision_title')
+                            ->label('Judul Revisi')
+                            ->maxLength(255)
+                            ->lazy()
+                            ->afterStateUpdated(function (Set $set, ?string $state) {
+                                $set('revision_slug', Str::slug($state));
+                                // $set('author', auth()->user()->name);
+                            }),
+                        TextInput::make('revision_slug')
+                            ->label('Slug Revisi')
+                            ->maxLength(255)
+                            ->unique(DocumentRevision::class, 'revision_slug', ignoreRecord: true),
+                        Textarea::make('revision_description')
+                            ->label('Deskripsi Revisi')
+                            ->nullable()
+                            ->maxLength(500),
+                        FileUpload::make('revision_file')
+                            ->label('File Revisi')
+                            ->directory('document_revisions')
+                            ->acceptedFileTypes([
+                                'application/pdf',
+                                'application/msword',
+                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                'application/vnd.ms-excel',
+                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                            ])
+                            ->maxSize(10240)
+                            ->multiple()
+                            ->downloadable()
+                            ->openable()
+                            ->maxFiles(5),
+                        TextInput::make('revision_url')
+                            ->label('URL Revisi')
+                            ->url(),
+                        TextInput::make('revision_author')
+                            ->label('Penulis Revisi')
+                            ->maxLength(255)
+                            ->default(Auth::user()->name),
+                        TextInput::make('revision_year')
+                            ->label('Tahun Revisi')
+                            ->numeric()
+                            ->maxLength(4),
+                        DatePicker::make('revision_date')
+                            ->label('Tanggal Revisi')
+                            ->date(),
+                    ]),
             ]);
     }
 
