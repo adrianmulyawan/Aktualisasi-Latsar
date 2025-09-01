@@ -26,6 +26,7 @@ class UserResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'Pengguna';
     protected static ?string $label = 'Data Pengguna';
+    protected static ?string $navigationGroup = 'Daftar Pengguna';
 
     public static function form(Form $form): Form
     {
@@ -143,5 +144,15 @@ class UserResource extends Resource
     public static function canView(Model $record): bool
     {
         return Auth::user()->hasRole('super_admin');
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Jumlah Pengguna Terdaftar';
     }
 }
