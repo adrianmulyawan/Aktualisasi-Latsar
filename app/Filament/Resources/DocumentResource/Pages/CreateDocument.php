@@ -16,4 +16,9 @@ class CreateDocument extends CreateRecord
         $data['user_id'] = Auth::user()->id; // Simpan user_id yang login
         return $data;
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }
