@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('document_requests', function (Blueprint $table) {
             $table->id();
             // user yang membuat request
-            $table->foreignId('user_id')->references('id')->on('users')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('user_id')->constrained()->references('id')->on('users')->cascadeOnDelete()->cascadeOnUpdate();
             // user yang ditugaskan untuk menangani request
-            $table->foreignId('assigned_to')->references('id')->on('users')->cascadeOnDelete()->cascadeOnUpdate()->nullable();
-            $table->foreignId('document_id')->references('id')->on('documents')->cascadeOnDelete()->cascadeOnUpdate()->nullable();
+            $table->foreignId('assigned_to')->nullable()->constrained()->references('id')->on('users')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('document_id')->nullable()->constrained()->references('id')->on('documents')->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('request_document_title');
             $table->text('notes')->nullable();
             $table->boolean('is_internal_document')->default(false);
