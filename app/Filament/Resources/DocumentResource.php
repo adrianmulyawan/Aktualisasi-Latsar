@@ -12,6 +12,7 @@ use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -62,13 +63,11 @@ class DocumentResource extends Resource
                     ->required()
                     // ->searchable()
                     ->columnSpanFull(),
-                Textarea::make('description')
+                RichEditor::make('description')
                     ->label('Deskripsi')
                     ->required()
                     ->maxLength(500)
-                    ->columnSpanFull()
-                    ->rows(10)
-                    ->cols(20),
+                    ->columnSpanFull(),
                 TextInput::make('year')
                     ->label('Tahun')
                     ->required()
@@ -91,6 +90,7 @@ class DocumentResource extends Resource
                         'application/vnd.ms-excel', // .xls
                         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
                     ])
+                    ->helperText('Format yang diperbolehkan: pdf, doc, docx, xlsx. Ukuran maksimal: 2MB.')
                     ->maxSize(10240) // 10 MB
                     ->multiple()
                     ->downloadable()
@@ -122,7 +122,7 @@ class DocumentResource extends Resource
                             ->label('Slug Revisi')
                             ->maxLength(255)
                             ->unique(DocumentRevision::class, 'revision_slug', ignoreRecord: true),
-                        Textarea::make('revision_description')
+                        RichEditor::make('revision_description')
                             ->label('Deskripsi Revisi')
                             ->nullable()
                             ->maxLength(500),
