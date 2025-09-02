@@ -39,4 +39,9 @@ class Document extends Model
     {
         return $this->hasMany(DocumentRevision::class);
     }
+
+    public function documentRequests()
+    {
+        return $this->hasMany(DocumentRequest::class);
+    }
 }
