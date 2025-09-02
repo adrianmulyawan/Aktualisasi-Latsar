@@ -20,6 +20,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
@@ -172,5 +173,31 @@ class DocumentRevisionResource extends Resource
             'create' => Pages\CreateDocumentRevision::route('/create'),
             'edit' => Pages\EditDocumentRevision::route('/{record}/edit'),
         ];
+    }
+
+    // public static function canViewAny(): bool
+    // {
+    //     return Auth::user()->hasRole('super_admin') || Auth::user()->hasRole('user');
+    // }
+
+    public static function canView(Model $record): bool
+    {
+        return Auth::user()->hasRole('super_admin') || Auth::user()->hasRole('user');
+    }
+
+    public static function canCreate(): bool
+    {
+        return Auth::user()->hasRole('super_admin') || Auth::user()->hasRole('user');
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        // return Auth::user()->hasRole('super_admin') || (Auth::user()->hasRole('user') && $record->user_id === Auth::user()->id);
+        return Auth::user()->hasRole('super_admin') || Auth::user()->hasRole('user');
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return Auth::user()->hasRole('super_admin') || (Auth::user()->hasRole('user') && $record->user_id === Auth::user()->id);
     }
 }
