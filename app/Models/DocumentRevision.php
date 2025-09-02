@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class DocumentRevision extends Model
 {
@@ -33,7 +34,7 @@ class DocumentRevision extends Model
         static::saving(function ($revision) {
             // Cek jika user_id kosong, maka set dengan ID pengguna yang sedang login
             if (!$revision->user_id) {
-                $revision->user_id = auth()->id();
+                $revision->user_id = Auth::user()->id;
             }
         });
     }
