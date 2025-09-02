@@ -227,6 +227,30 @@ class DocumentResource extends Resource
         ];
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        $user = Auth::user();
+
+        // Super admin & staff subbagian (role user)
+        if ($user->hasRole(['super_admin', 'user'])) {
+            return parent::getEloquentQuery();
+        }
+
+        // Guest hanya bisa lihat dokumen yg request-nya sudah di-approve
+        if ($user->hasRole('guest')) {
+            return parent::getEloquentQuery()
+                ->whereIn('id', function ($query) use ($user) {
+                    $query->select('document_id')
+                        ->from('document_requests')
+                        ->where('user_id', $user->id)
+                        ->where('status', 'completed');
+                });
+        }
+
+        // selain itu tidak boleh lihat apa pun
+        return parent::getEloquentQuery()->whereRaw('1=0');
+    }
+
     public static function canCreate(): bool
     {
         return Auth::user()->hasRole('super_admin') || Auth::user()->hasRole('user');
