@@ -251,6 +251,24 @@ class DocumentResource extends Resource
         return parent::getEloquentQuery()->whereRaw('1=0');
     }
 
+    public static function canView(Model $record): bool
+    {
+        $user = Auth::user();
+
+        if ($user->hasRole(['super_admin', 'user'])) {
+            return true;
+        }
+
+        if ($user->hasRole('guest')) {
+            return \App\Models\DocumentRequest::where('document_id', $record->id)
+                ->where('user_id', $user->id)
+                ->where('status', 'completed')
+                ->exists();
+        }
+
+        return false;
+    }
+
     public static function canCreate(): bool
     {
         return Auth::user()->hasRole('super_admin') || Auth::user()->hasRole('user');
