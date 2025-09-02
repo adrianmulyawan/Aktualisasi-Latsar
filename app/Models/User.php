@@ -61,4 +61,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(DocumentRevision::class);
     }
+
+    public function documentRequests()
+    {
+        return $this->hasMany(DocumentRequest::class);
+    }
+
+    public function assignedDocumentRequests() // request yang ditugaskan ke dia
+    {
+        return $this->hasMany(DocumentRequest::class, 'assigned_to');
+    }
 }
