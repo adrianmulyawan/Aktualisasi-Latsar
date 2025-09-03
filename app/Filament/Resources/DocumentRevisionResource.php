@@ -100,6 +100,18 @@ class DocumentRevisionResource extends Resource
                     ->label('Tanggal Revisi')
                     ->date()
                     ->columnSpanFull(),
+                Select::make('status')
+                    ->label('Status')
+                    ->options([
+                        'draft' => 'Draft',
+                        'review' => 'Proses Review',
+                        'approved' => 'Disetujui',
+                        'rejected' => 'Ditolak',
+                    ])
+                    ->default('draft')
+                    ->required()
+                    ->columnSpanFull()
+                    ->visible(fn($livewire) => $livewire instanceof Pages\EditDocumentRevision),
             ]);
     }
 
@@ -130,6 +142,25 @@ class DocumentRevisionResource extends Resource
                     ->label('Tanggal Revisi')
                     ->date()
                     ->sortable(),
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'draft'     => 'Draft',
+                        'review'    => 'Proses Review',
+                        'approved'  => 'Disetujui',
+                        'rejected'  => 'Ditolak',
+                        default     => $state,
+                    })
+                    ->color(fn(string $state): string => match ($state) {
+                        'draft'     => 'primary',  // Badge warna abu-abu untuk draft
+                        'review'    => 'warning',    // Badge warna kuning untuk review
+                        'approved'  => 'success',    // Badge hijau untuk approved
+                        'rejected'  => 'danger',     // Badge merah untuk rejected
+                        default     => 'primary',    // Badge biru untuk status lainnya
+                    }),
             ])
             ->filters([
                 SelectFilter::make('document')
@@ -145,7 +176,16 @@ class DocumentRevisionResource extends Resource
                             ->orderBy('revision_year', 'desc')
                             ->pluck('revision_year', 'revision_year')
                             ->toArray();
-                    })->placeholder('Semua Tahun')
+                    })->placeholder('Semua Tahun'),
+                SelectFilter::make('status')
+                    ->label('Status')
+                    ->options([
+                        'draft' => 'Draft',
+                        'review' => 'Proses Review',
+                        'approved' => 'Disetujui',
+                        'rejected' => 'Ditolak',
+                    ])
+                    ->placeholder('Semua Status'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

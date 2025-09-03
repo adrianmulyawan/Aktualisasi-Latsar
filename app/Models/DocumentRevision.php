@@ -21,6 +21,7 @@ class DocumentRevision extends Model
         'revision_author',
         'revision_year',
         'revision_date',
+        'status'
     ];
 
     protected $casts = [
