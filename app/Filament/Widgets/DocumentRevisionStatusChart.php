@@ -4,9 +4,12 @@ namespace App\Filament\Widgets;
 
 use App\Models\DocumentRevision;
 use Filament\Widgets\ChartWidget;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 
 class DocumentRevisionStatusChart extends ChartWidget
 {
+    use InteractsWithPageFilters;
+
     protected static ?string $heading = 'Status Revisi Dokumen';
     protected static ?string $pollingInterval = '10s';
     protected static ?int $sort = 5;
@@ -14,42 +17,58 @@ class DocumentRevisionStatusChart extends ChartWidget
 
     protected function getData(): array
     {
-        // Ambil jumlah revisi berdasarkan status
-        $revisionStatuses = DocumentRevision::selectRaw('status, COUNT(*) as total')
-            ->groupBy('status')  // Group by berdasarkan status
-            ->get();
+        $startDate = $this->filters['start_date'] ?? null;
+        $endDate   = $this->filters['end_date'] ?? null;
 
-        // Siapkan data untuk chart
-        $labels = $revisionStatuses->pluck('status')->toArray();  // Status dokumen
-        $data = $revisionStatuses->pluck('total')->toArray();  // Jumlah revisi per status
+        // Base query: pakai revision_date; kalau filter kosong → tahun berjalan
+        $query = DocumentRevision::query()
+            ->when(
+                $startDate && $endDate,
+                fn($q) =>
+                $q->whereBetween('revision_date', [$startDate, $endDate])
+            )
+            ->when(
+                !($startDate && $endDate),
+                fn($q) =>
+                $q->whereYear('revision_date', now()->year)
+            );
 
-        // Tentukan warna chart untuk setiap status
+        $rows = $query
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->get()
+            ->pluck('total', 'status'); // ['draft'=>N, ...]
+
+        // Urutan & label tetap
+        $ordered = ['draft', 'review', 'approved', 'rejected'];
+        $labels  = ['Draft', 'Proses Review', 'Disetujui', 'Ditolak'];
+
+        // Pastikan status yang tidak ada tetap 0
+        $data = [];
+        foreach ($ordered as $s) {
+            $data[] = (int) ($rows[$s] ?? 0);
+        }
+
+        // Warna konsisten
         $colors = [
-            'draft' => '#FF6384',   // Merah untuk Draft
-            'review' => '#FFCE56',  // Kuning untuk Proses Review
-            'approved' => '#36A2EB', // Biru untuk Disetujui
-            'rejected' => '#4BC0C0', // Hijau untuk Ditolak
+            '#FF6384', // draft
+            '#FFCE56', // review
+            '#36A2EB', // approved
+            '#4BC0C0', // rejected
         ];
 
-        // Tentukan warna berdasarkan status
-        $backgroundColor = $revisionStatuses->map(function ($item) use ($colors) {
-            return $colors[$item->status] ?? '#FF9F40'; // Default warna oranye jika status tidak dikenali
-        })->toArray();
-
         return [
-            'datasets' => [
-                [
-                    'label' => 'Jumlah Revisi Dokumen',
-                    'data' => $data,
-                    'backgroundColor' => $backgroundColor, // Gunakan warna berdasarkan status
-                ],
-            ],
-            'labels' => $labels,  // Label status
+            'datasets' => [[
+                'label' => 'Jumlah Revisi Dokumen',
+                'data'  => $data,
+                'backgroundColor' => $colors,
+            ]],
+            'labels' => $labels,
         ];
     }
 
     protected function getType(): string
     {
-        return 'pie';
+        return 'pie'; // bisa diganti 'doughnut' kalau mau
     }
 }

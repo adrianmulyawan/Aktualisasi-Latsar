@@ -4,45 +4,72 @@ namespace App\Filament\Widgets;
 
 use App\Models\DocumentRequest;
 use Filament\Widgets\ChartWidget;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Illuminate\Support\Facades\Auth;
 
 class DocumentRequestStatusChart extends ChartWidget
 {
+    use InteractsWithPageFilters;
+
     protected static ?string $heading = 'Permintaan Dokumen Berdasarkan Status';
-    protected static ?string $pollingInterval = '10s'; // Memperbarui chart setiap 10 detik (opsional)
-    protected static ?int $sort = 3;  // Penempatan widget (opsional)
-    protected static ?string $maxHeight = '235px'; // Atur tinggi maksimum widget (opsional)
+    protected static ?string $pollingInterval = '10s';
+    protected static ?int $sort = 3;
+    protected static ?string $maxHeight = '235px';
 
     protected function getData(): array
     {
-        // Ambil jumlah permintaan berdasarkan status dokumen
-        $documentRequests = DocumentRequest::selectRaw('status, COUNT(*) as total')
-            ->groupBy('status')  // Group by berdasarkan status
-            ->whereIn('status', ['pending', 'completed']) // Filter hanya status 'pending' dan 'complete'
+        $startDate = $this->filters['start_date'] ?? null;
+        $endDate   = $this->filters['end_date'] ?? null;
+
+        $query = DocumentRequest::query()
+            // (Opsional) batasi data untuk guest hanya miliknya
+            ->when(
+                Auth::user()?->hasRole('guest'),
+                fn($q) =>
+                $q->where('user_id', Auth::id())
+            )
+            // filter tanggal jika ada, kalau tidak ada pakai tahun berjalan
+            ->when(
+                $startDate && $endDate,
+                fn($q) =>
+                $q->whereBetween('created_at', [$startDate, $endDate])
+            )
+            ->when(
+                !($startDate && $endDate),
+                fn($q) =>
+                $q->whereYear('created_at', now()->year)
+            );
+
+        // Ambil agregat per status (hanya pending & completed)
+        $rows = $query->selectRaw('status, COUNT(*) as total')
+            ->whereIn('status', ['pending', 'completed'])
+            ->groupBy('status')
             ->get();
 
-        // Siapkan data untuk chart
-        $labels = $documentRequests->pluck('status')->toArray();  // Status dokumen (pending, complete)
-        $data = $documentRequests->pluck('total')->toArray();  // Jumlah permintaan per status
+        // Susun urutan label tetap (agar posisi tidak lompat-lompat)
+        $orderedStatuses = ['pending', 'completed'];
+        $totalsByStatus = collect($orderedStatuses)
+            ->mapWithKeys(fn($s) => [$s => 0])
+            ->merge($rows->pluck('total', 'status')->toArray());
 
-        // Tentukan warna chart untuk setiap status
+        $labels = ['Pending', 'Completed'];
+        $data   = array_values($totalsByStatus->toArray());
+
+        // Warna konsisten dengan key 'completed' (bukan 'complete')
         $colors = [
-            'pending' => '#FF6384',  // Merah untuk pending
-            'complete' => '#36A2EB', // Biru untuk complete
+            'pending'   => '#FF6384',
+            'completed' => '#36A2EB',
         ];
-
-        // Tentukan warna berdasarkan status
-        $backgroundColor = $documentRequests->map(function ($item) use ($colors) {
-            return $colors[$item->status] ?? '#FF9F40'; // Default warna oranye jika status tidak dikenali
-        })->toArray();
+        $backgroundColors = $orderedStatuses
+            ? array_map(fn($s) => $colors[$s] ?? '#FF9F40', $orderedStatuses)
+            : ['#FF9F40', '#36A2EB'];
 
         return [
-            'datasets' => [
-                [
-                    'label' => 'Jumlah Permintaan Dokumen',
-                    'data' => $data,
-                    'backgroundColor' => $backgroundColor, // Gunakan warna berdasarkan status
-                ],
-            ],
+            'datasets' => [[
+                'label' => 'Jumlah Permintaan Dokumen',
+                'data'  => $data,
+                'backgroundColor' => $backgroundColors,
+            ]],
             'labels' => $labels,
         ];
     }
