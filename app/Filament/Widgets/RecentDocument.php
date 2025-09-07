@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Illuminate\Support\Facades\Auth;
 
 class RecentDocument extends BaseWidget
 {
@@ -12,6 +13,16 @@ class RecentDocument extends BaseWidget
     protected static ?int $sort = 5;
     protected static ?string $pollingInterval = '10s';
     protected int | string | array $columnSpan = 2;
+
+    // Menambahkan pengecekan role pada widget
+    public static function canView(): bool
+    {
+        // Mendapatkan user yang sedang login
+        $user = Auth::user();
+
+        // Cek apakah user memiliki role yang sesuai
+        return $user && $user->hasAnyRole(['super_admin', 'user', 'kepala_dinas']);
+    }
 
     public function table(Table $table): Table
     {

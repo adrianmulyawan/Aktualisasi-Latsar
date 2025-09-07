@@ -16,6 +16,16 @@ class DocumentRequestStatusChart extends ChartWidget
     protected static ?int $sort = 3;
     protected static ?string $maxHeight = '235px';
 
+    // Menambahkan pengecekan role pada widget
+    public static function canView(): bool
+    {
+        // Mendapatkan user yang sedang login
+        $user = Auth::user();
+
+        // Cek apakah user memiliki role yang sesuai
+        return $user && $user->hasAnyRole(['super_admin', 'user', 'kepala_dinas']);
+    }
+
     protected function getData(): array
     {
         $startDate = $this->filters['start_date'] ?? null;

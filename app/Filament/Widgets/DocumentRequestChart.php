@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Models\DocumentRequest;
 use Filament\Widgets\ChartWidget;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Illuminate\Support\Facades\Auth;
 
 class DocumentRequestChart extends ChartWidget
 {
@@ -13,6 +14,16 @@ class DocumentRequestChart extends ChartWidget
     protected static ?string $heading = 'Permintaan Dokumen per Judul';
     protected static ?string $pollingInterval = '10s';
     protected static ?int $sort = 3;
+
+    // Menambahkan pengecekan role pada widget
+    public static function canView(): bool
+    {
+        // Mendapatkan user yang sedang login
+        $user = Auth::user();
+
+        // Cek apakah user memiliki role yang sesuai
+        return $user && $user->hasAnyRole(['super_admin', 'user', 'kepala_dinas']);
+    }
 
     protected function getData(): array
     {
