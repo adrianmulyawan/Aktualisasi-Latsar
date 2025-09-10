@@ -240,4 +240,9 @@ class DocumentRequestResource extends Resource
     {
         return Auth::user()->hasRole('super_admin') || Auth::user()->hasRole('user');
     }
+
+    public static function canEdit(Model $record): bool
+    {
+        return Auth::user()->hasRole('super_admin') || Auth::user()->hasRole('user') || ($record->user_id === Auth::user()->id || $record->assigned_to === Auth::user()->id);
+    }
 }
