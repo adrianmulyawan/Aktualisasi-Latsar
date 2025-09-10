@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 class StatsOverview extends BaseWidget
 {
     use InteractsWithPageFilters;
-
+    protected static ?int $sort = 1;
     protected function getStats(): array
     {
         // Mengambil filter tanggal dari halaman

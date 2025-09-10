@@ -177,6 +177,9 @@ class DocumentResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->limit(50),
+                TextColumn::make('year')
+                    ->label('Tahun')
+                    ->sortable(),
                 TextColumn::make('user.name')
                     ->label('Penulis')
                     ->searchable()
