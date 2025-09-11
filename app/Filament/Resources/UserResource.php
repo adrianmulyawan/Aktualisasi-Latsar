@@ -44,6 +44,12 @@ class UserResource extends Resource
                     ->maxLength(255)
                     ->unique(User::class, 'email', ignoreRecord: true)
                     ->columnSpanFull(),
+                TextInput::make('nip')
+                    ->label('NIP')
+                    ->required()
+                    ->maxLength(255)
+                    ->unique(User::class, 'nip', ignoreRecord: true)
+                    ->columnSpanFull(),
                 TextInput::make('password')
                     ->label('Kata Sandi')
                     ->password()
@@ -53,8 +59,8 @@ class UserResource extends Resource
                     ->maxLength(255)
                     ->dehydrated(fn($state) => !empty($state))
                     ->revealable(true)
-                    ->columnSpanFull()
-                    ->visible(fn(string $operation): bool => $operation === 'create'),
+                    ->columnSpanFull(),
+                // ->visible(fn(string $operation): bool => $operation === 'create'),
                 DateTimePicker::make('email_verified_at')
                     ->label('Email Terverifikasi Pada')
                     ->required(fn(Forms\Get $get) => $get('id') === null)
