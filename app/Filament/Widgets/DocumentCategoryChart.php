@@ -11,7 +11,7 @@ class DocumentCategoryChart extends ChartWidget
 {
     protected static ?string $heading = 'Jumlah Dokumen per Kategori';
     protected static ?string $pollingInterval = '10s';
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 3;
     protected static ?string $maxHeight = '235px';
 
     use InteractsWithPageFilters;

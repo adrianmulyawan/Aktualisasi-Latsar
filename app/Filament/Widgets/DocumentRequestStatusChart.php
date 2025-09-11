@@ -13,7 +13,7 @@ class DocumentRequestStatusChart extends ChartWidget
 
     protected static ?string $heading = 'Permintaan Dokumen Berdasarkan Status';
     protected static ?string $pollingInterval = '10s';
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 5;
     protected static ?string $maxHeight = '235px';
 
     // Menambahkan pengecekan role pada widget

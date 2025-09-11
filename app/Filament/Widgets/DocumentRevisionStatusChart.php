@@ -13,7 +13,7 @@ class DocumentRevisionStatusChart extends ChartWidget
 
     protected static ?string $heading = 'Status Revisi Dokumen';
     protected static ?string $pollingInterval = '10s';
-    protected static ?int $sort = 5;
+    protected static ?int $sort = 7;
     protected static ?string $maxHeight = '235px';
 
     // Menambahkan pengecekan role pada widget

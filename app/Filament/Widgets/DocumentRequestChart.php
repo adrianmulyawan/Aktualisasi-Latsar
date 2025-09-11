@@ -13,7 +13,7 @@ class DocumentRequestChart extends ChartWidget
 
     protected static ?string $heading = 'Permintaan Dokumen per Judul';
     protected static ?string $pollingInterval = '10s';
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 4;
 
     // Menambahkan pengecekan role pada widget
     public static function canView(): bool

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class RecentDocumentRequest extends BaseWidget
 {
     protected static ?string $heading = 'Permintaan Dokumen Terbaru';
-    protected static ?int $sort = 5;
+    protected static ?int $sort = 9;
     protected static ?string $pollingInterval = '10s';
     protected int | string | array $columnSpan = 2;
 

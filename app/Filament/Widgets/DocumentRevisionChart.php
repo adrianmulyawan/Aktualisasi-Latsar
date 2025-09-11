@@ -13,7 +13,7 @@ class DocumentRevisionChart extends ChartWidget
 
     protected static ?string $heading = 'Revisi Dokumen Berdasarkan Bulan';
     protected static ?string $pollingInterval = '10s';
-    protected static ?int $sort = 4;
+    protected static ?int $sort = 6;
 
     // Menambahkan pengecekan role pada widget
     public static function canView(): bool
